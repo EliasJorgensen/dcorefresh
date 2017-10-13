@@ -33,6 +33,13 @@ const dco_file = yaml.safeLoad(
 	)
 );
 
+
+// Make sure that the docker-compose file has at least 1 service
+if (dco_file.services === null) {
+	console.log(chalk.bold.red('Error: docker-compose file does not contain any services'))
+	process.exit(1)
+}
+
 // Extract services
 const services = Object.keys(dco_file.services)
 
