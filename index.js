@@ -1,16 +1,19 @@
 // Modules
-const command_exists = require('command-exists')
-const { exec } = require('child_process')
-const inquirer = require('inquirer')
+const fs = require('fs')
+const ora = require('ora')
 const chalk = require('chalk')
 const yaml = require('js-yaml')
-const fs = require('fs')
+const inquirer = require('inquirer')
+const command_exists = require('command-exists')
 
 // Constants
-const DCO_FILE = `${process.cwd()}/docker-compose.yml`
+const DCO_FILE_PATH = `${process.cwd()}/docker-compose.yml`
 
-// Make sure that DCO_FILE exists
-if (!fs.existsSync(DCO_FILE)) {
+// Util
+const { refresh } = require('./util')
+
+// Make sure that docker-compose file exists
+if (!fs.existsSync(DCO_FILE_PATH)) {
 	console.log(chalk.bold.red('Error: No docker-compose.yml file in current directory'))
 	process.exit(1)
 }
@@ -23,18 +26,33 @@ command_exists('docker-compose', (err, command_exists) => {
 	}
 })
 
-const doc = yaml.safeLoad(fs.readFileSync(
-'/Users/elias/Projects/Code/HTML24/koebt_bornholm/docker-compose.yml', 'utf8'
-));
+// Parse docker-compose file
+const dco_file = yaml.safeLoad(
+	fs.readFileSync(
+		DCO_FILE_PATH, 'utf8'
+	)
+);
 
-const services = Object.keys(doc.services)
+// Extract services
+const services = Object.keys(dco_file.services)
 
+// Show prompt
 inquirer.prompt([{
 	type: 'checkbox',
-	name: 'theme',
+	name: 'services',
 	message: 'Which services do you want to refresh?',
-	pageSize: 1000,
+	pageSize: 40,
 	choices: services
-}]).then(function (answers) {
-	console.log(JSON.stringify(answers, null, '  '))
+}])
+.then(function ({ services }) {
+	services.map(service => {
+		const spinner = ora(`Refreshing ${service}`).start()
+		refresh(service)
+		.then((stdout) => {
+			spinner.succeed()
+		})
+		.catch(e => {
+			spinner.fail("Something went wrong:")
+		})
+	})
 })
