@@ -19,8 +19,8 @@ Note: make sure that you are in a directory with a `docker-compose.yml` file, or
 
 ## Options
 ```sh
-  -r          Refreshes the last chosen services
-  -l       		Set length of page  		              [number] [default: 20]
+  -r    Refreshes the last chosen services
+  -l    Set length of page                  [number] [default: 20]
 ```
 
 ## License
