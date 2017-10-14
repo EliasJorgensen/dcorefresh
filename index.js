@@ -3,6 +3,7 @@ const fs = require('fs')
 const ora = require('ora')
 const chalk = require('chalk')
 const yaml = require('js-yaml')
+const { argv } = require('yargs')
 const inquirer = require('inquirer')
 const command_exists = require('command-exists')
 
@@ -48,7 +49,7 @@ inquirer.prompt([{
 	type: 'checkbox',
 	name: 'services',
 	message: 'Which services do you want to refresh?',
-	pageSize: 40,
+	pageSize: argv.l || 20,
 	choices: services
 }])
 .then(function ({ services }) {
