@@ -1,6 +1,5 @@
 // Modules
 const fs = require('fs')
-const ora = require('ora')
 const chalk = require('chalk')
 const yaml = require('js-yaml')
 const { argv } = require('yargs')
@@ -11,10 +10,12 @@ const command_exists = require('command-exists')
 const DCO_FILE_PATH = `${process.cwd()}/docker-compose.yml`
 
 // Util
-const { refresh } = require('./util')
+const { refreshServices, saveConfig, readConfig } = require('./util')
 
 // Make sure that docker-compose file exists
-if (!fs.existsSync(DCO_FILE_PATH)) {
+try {
+	fs.statSync(DCO_FILE_PATH)
+} catch (e) {
 	console.log(chalk.bold.red('Error: No docker-compose.yml file in current directory'))
 	process.exit(1)
 }
@@ -44,23 +45,27 @@ if (dco_file.services === null) {
 // Extract services
 const services = Object.keys(dco_file.services)
 
-// Show prompt
-inquirer.prompt([{
-	type: 'checkbox',
-	name: 'services',
-	message: 'Which services do you want to refresh?',
-	pageSize: argv.l || 20,
-	choices: services
-}])
-.then(function ({ services }) {
-	services.map(service => {
-		const spinner = ora(`Refreshing ${service}`).start()
-		refresh(service)
-		.then((stdout) => {
-			spinner.succeed()
+
+// If -r is passed, run the previously restarted services
+if (argv.r) {
+	const { services } = readConfig()
+	refreshServices(services)
+		.then(res => process.exit(0))
+} else {
+	// Show prompt
+	inquirer.prompt([{
+		type: 'checkbox',
+		name: 'services',
+		message: 'Which services do you want to refresh?',
+		pageSize: argv.l || 20,
+		choices: services
+	}])
+	.then(function ({ services }) {
+		saveConfig({
+			"path": DCO_FILE_PATH,
+			"services": services
 		})
-		.catch(e => {
-			spinner.fail("Something went wrong:")
-		})
+		
+		refreshServices(services)
 	})
-})
+}
