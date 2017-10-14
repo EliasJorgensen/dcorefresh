@@ -5,7 +5,7 @@ const exec = promisify(require('child_process').exec, { multiArgs: true })
 // Kills, rebuilds and restarts service
 exports.refresh = async function(service) {
 	const { err, stdout, stderr } = await exec(`
-		docker-compose kill ${service} &&
+		docker-compose stop ${service} &&
 		docker-compose build ${service} &&
 		docker-compose up -d ${service}`
 	);
