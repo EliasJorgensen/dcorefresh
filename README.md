@@ -18,8 +18,10 @@ Now you will get a UI where you can choose the services that you want to refresh
 Note: make sure that you are in a directory with a `docker-compose.yml` file, or you will receive an error.
 
 ## Options
-
-Coming soon 😇
+```sh
+  -l       		Set length of page  		[number] [default: 20]
+```
+More coming soon 😇
 
 ## License
 Licensed under MIT.
