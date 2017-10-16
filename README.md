@@ -1,6 +1,8 @@
 # dcorefresh
 >Node based CLI tool for refreshing docker-compose services
 
+[![asciicast](https://asciinema.org/a/ACzMABFS2Zq3qukzMaKqV6KxS.png)](https://asciinema.org/a/ACzMABFS2Zq3qukzMaKqV6KxS)
+
 dcorefresh lets you update one or more docker-compose services through a simple CLI interface, so that you no longer will have to type a bunch of long service names. If more than one service is selected, then the services will be refreshed in parallel.
 
 ***Refresh***: *The act of running stop, build and up on a docker-compose service. Yes, i made it up.*
