@@ -6,16 +6,19 @@ const { argv } = require('yargs')
 const inquirer = require('inquirer')
 const command_exists = require('command-exists')
 
-// Constants
-const DCO_FILE_PATH = `${process.cwd()}/docker-compose.yml`
+// File path
+let DCO_FILE_PATH = ''
 
 // Util
 const { refreshServices, saveConfig, readConfig } = require('./util')
 
 // Make sure that docker-compose file exists
-try {
-	fs.statSync(DCO_FILE_PATH)
-} catch (e) {
+fs.readdirSync(process.cwd()).forEach(file => {
+	if (file === 'docker-compose.yml' || file === 'docker-compose.yaml')
+		DCO_FILE_PATH = file
+})
+
+if (DCO_FILE_PATH === '') {
 	console.log(chalk.bold.red('Error: No docker-compose.yml file in current directory'))
 	process.exit(1)
 }
@@ -33,7 +36,7 @@ const dco_file = yaml.safeLoad(
 	fs.readFileSync(
 		DCO_FILE_PATH, 'utf8'
 	)
-);
+)
 
 
 // Make sure that the docker-compose file has at least 1 service
